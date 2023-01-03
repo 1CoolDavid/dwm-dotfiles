@@ -1,0 +1,40 @@
+#!/bin/sh
+
+cap=$(cat /sys/class/power_supply/BAT0/capacity)
+stat=$(cat /sys/class/power_supply/BAT0/status)
+
+cap_group=$((cap/10))
+icon=""
+
+
+
+case $cap_group in 
+	10)
+		;;
+	9)
+		icon=""
+		;;
+	8)	icon=""
+		;;
+	7)	icon=""
+		;;
+	6)	icon=""
+		;;
+	5)	icon=""
+		;;
+	4)	icon=""
+		;;
+	3)	icon=""
+		;;
+	2)	icon=""
+		;;
+	*)
+		icon=""
+		;;
+esac
+
+if [ "$stat" = "Charging" ]; then
+	icon=""
+fi
+
+echo "${icon} ${cap}%"
