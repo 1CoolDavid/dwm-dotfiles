@@ -2,7 +2,7 @@
 
 cap=$(cat /sys/class/power_supply/BAT0/capacity)
 stat=$(cat /sys/class/power_supply/BAT0/status)
-
+powersave=false
 cap_group=$((cap/10))
 icon=""
 
@@ -26,15 +26,34 @@ case $cap_group in
 		;;
 	3)	icon=""
 		;;
-	2)	icon=""
+	2)	icon="";
+		powersave=true
 		;;
 	*)
-		icon=""
+		icon="";
+		powersave=true
 		;;
 esac
 
+brightness=$(cat /sys/class/backlight/intel_backlight/brightness)
+
+max=$(cat /sys/class/backlight/intel_backlight/max_brightness)
+
+percentage=$(( (brightness*100)/max))
+
 if [ "$stat" = "Charging" ]; then
+	powersave=false
 	icon=""
+
+	if [[ "$percentage" -le 20 ]]; then
+		acpi_bright -d intel_backlight -s 80%
+	fi
+fi
+
+if [ "$powersave" = true ]; then 
+	if [[ "$percentage" -gt 20 ]]; then 
+		acpi_bright -d intel_backlight -s 20%
+	fi
 fi
 
 echo "${icon} ${cap}%"
